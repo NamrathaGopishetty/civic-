@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const auth = require("../middleware/auth");
 const { reverseGeocode } = require("../utils/nominatim");
+const { sendMail } = require("../config/mailer");
 require("dotenv").config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_key_change_me";
@@ -130,6 +131,22 @@ router.post("/register-authority", async (req, res) => {
 
     await user.save();
 
+    try {
+      await sendMail({
+        to: user.email,
+        subject: "Authority Access Granted - Civic Platform",
+        html: `
+          <p>Hello ${user.name || "there"},</p>
+          <p>Your authority account for the Civic Issue Management platform has been created successfully.</p>
+          <p><strong>Department:</strong> ${user.department || "N/A"}</p>
+          <p>You can now log in to the authority dashboard to review, assign, and update citizen-reported issues.</p>
+          <p>Best regards,<br/>Civic Connect Team</p>
+        `,
+      });
+    } catch (mailErr) {
+      console.warn("Authority welcome email failed:", mailErr.message);
+    }
+
     return res.status(201).json({ 
       message: "Authority registered successfully",
       user: {
@@ -226,6 +243,21 @@ router.post("/register", async (req, res) => {
     });
 
     await user.save();
+
+    try {
+      await sendMail({
+        to: user.email,
+        subject: "Welcome to Civic Connect",
+        html: `
+          <p>Hi ${user.name || "there"},</p>
+          <p>Thank you for registering with the Civic Issue Management platform. You can now report issues, upload supporting media, and track resolution progress directly from the mobile app.</p>
+          <p>We are here to help you keep your community running smoothly.</p>
+          <p>Best regards,<br/>Civic Connect Team</p>
+        `,
+      });
+    } catch (mailErr) {
+      console.warn("Citizen welcome email failed:", mailErr.message);
+    }
 
     return res.status(201).json({ message: "User registered successfully" });
   } catch (err) {

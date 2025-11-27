@@ -130,9 +130,11 @@ const multer = require("multer");
 const streamifier = require("streamifier");
 
 const Issue = require("../models/Issue");
+const User = require("../models/User");
 const auth = require("../middleware/auth");
 const cloudinary = require("../config/cloudinary");
 const { transformIssueForWebPortal } = require("../utils/transformIssue");
+const { sendMail } = require("../config/mailer");
 
 const MAX_FILES = 5;
 const upload = multer({
@@ -216,6 +218,29 @@ router.post("/create", auth, upload.array("media", MAX_FILES), async (req, res) 
     });
 
     await issue.save();
+
+    try {
+      const reporter = await User.findById(req.user.id).select("name email");
+      if (reporter?.email) {
+        await sendMail({
+          to: reporter.email,
+          subject: "Issue submitted successfully",
+          html: `
+            <p>Hi ${reporter.name || "there"},</p>
+            <p>Your issue has been received with the following details:</p>
+            <ul>
+              <li><strong>Description:</strong> ${description}</li>
+              <li><strong>Category:</strong> ${category}</li>
+              <li><strong>Priority:</strong> ${priority}</li>
+            </ul>
+            <p>We will keep you posted as the status changes.</p>
+            <p>Thanks for helping us improve the city.</p>
+          `,
+        });
+      }
+    } catch (mailErr) {
+      console.warn("Issue submission email failed:", mailErr.message);
+    }
 
     res.status(201).json({
       message: "Issue reported successfully!",
@@ -442,7 +467,6 @@ router.put("/:id/status", auth, async (req, res) => {
     }
 
     // Get current user (authority)
-    const User = require("../models/User");
     const currentUser = await User.findById(req.user.id);
 
     // Map web portal status to backend status
@@ -494,6 +518,35 @@ router.put("/:id/status", auth, async (req, res) => {
 
     await issue.save();
 
+    try {
+      const recipients = [];
+      if (issue.user?.email) {
+        recipients.push(issue.user.email);
+      }
+      if (currentUser?.email) {
+        recipients.push(currentUser.email);
+      }
+
+      if (recipients.length) {
+        await sendMail({
+          to: recipients,
+          subject: `Issue status updated to ${status}`,
+          html: `
+            <p>Hello,</p>
+            <p>The issue <strong>${issue.description?.slice(0, 80) || issue._id}</strong> has been updated.</p>
+            <ul>
+              <li><strong>Status:</strong> ${status}</li>
+              <li><strong>Department:</strong> ${issue.assignedDepartment || currentUser?.department || "N/A"}</li>
+              <li><strong>Notes:</strong> ${timelineNote}</li>
+            </ul>
+            <p>You will continue to receive notifications for future updates.</p>
+          `,
+        });
+      }
+    } catch (mailErr) {
+      console.warn("Status update email failed:", mailErr.message);
+    }
+
     // Transform for web portal if requested
     const transform = req.query.transform === "true" || req.headers["x-transform"] === "true";
     const responseIssue = transform ? transformIssueForWebPortal(issue) : issue;
@@ -520,7 +573,6 @@ router.get("/:id", auth, async (req, res) => {
     }
 
     // Check access: user can see their own issues, authorities can see issues in their department
-    const User = require("../models/User");
     const currentUser = await User.findById(req.user.id);
     
     // If user is citizen, only allow if they own the issue
