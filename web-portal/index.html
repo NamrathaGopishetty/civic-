@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Authority Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .language-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .language-bar select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .dashboard {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .success {
+            color: #28a745;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filters select {
+            flex: 1;
+            min-width: 150px;
+        }
+        .issues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .issue-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .issue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .issue-card.pending {
+            border-left: 4px solid #ffc107;
+        }
+        .issue-card.in-progress {
+            border-left: 4px solid #17a2b8;
+        }
+        .issue-card.resolved {
+            border-left: 4px solid #28a745;
+        }
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-acknowledged {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-in-progress {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .priority-badge {
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .priority-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .priority-low {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .issue-description {
+            color: #666;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .radius-warning {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #dc3545;
+        }
+        .radius-note {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #28a745;
+        }
+        .issue-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .issue-actions button[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .dual-input-row {
+            display: flex;
+            gap: 10px;
+        }
+        .dual-input-row input {
+            flex: 1;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-tab.active {
+            background: #667eea;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .analytics-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fdfdff;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+        }
+        .analytics-card h3 {
+            margin-bottom: 12px;
+            color: #4a4a4a;
+        }
+        .analytics-card canvas {
+            width: 100%;
+            height: 260px;
+        }
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-info {
+            background: #17a2b8;
+        }
+        .btn-info:hover {
+            background: #138496;
+        }
+        .hidden {
+            display: none;
+        }
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .issue-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .issue-images img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .timeline {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .timeline-item {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #667eea;
+            padding-left: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .timeline-status {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .timeline-note {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .timeline-date {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="language-bar">
+        <label for="languageSelect" data-i18n="common.languageLabel">Language</label>
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+        </select>
+    </div>
+    <!-- Login/Register View -->
+    <div id="authView" class="auth-container">
+        <h1>Civic Authority Portal</h1>
+        <div id="authForm">
+            <h2 id="authTitle">Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="button" id="loginSubmit">Login</button>
+                <button type="button" class="btn-secondary" onclick="showRegister()">Don't have an account? Register</button>
+            </form>
+        </div>
+        <div id="registerForm" class="hidden">
+            <h2>Register as Authority</h2>
+            <form id="registerFormElement">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="regDepartment" required>
+                        <option value="">Select Department</option>
+                        <option value="Roads">Roads</option>
+                        <option value="Water">Water</option>
+                        <option value="Sanitation">Sanitation</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Department Location - Address</label>
+                    <input type="text" id="regDeptAddress" placeholder="Street address" required>
+                </div>
+                <div class="form-group">
+                    <label>Department Location - City</label>
+                    <input type="text" id="regDeptCity" placeholder="City" required>
+                    <small id="locationHintText" style="color: #666; font-size: 12px; display: block; margin-top: 5px;">Location will be automatically geocoded using Nominatim</small>
+                </div>
+                <div class="form-group">
+                    <button type="button" id="useCurrentLocationBtn" style="background:#17a2b8;">Use my current location</button>
+                    <small id="locationStatus" style="display:block; margin-top:5px; color:#666;">You can auto-fill your department address using GPS</small>
+                </div>
+                <div class="form-group">
+                    <label id="coordsLabel">Department coordinates (optional)</label>
+                    <div class="dual-input-row">
+                        <input type="text" id="regDeptLat" placeholder="Latitude">
+                        <input type="text" id="regDeptLng" placeholder="Longitude">
+                    </div>
+                    <small id="coordsHint" style="color: #666; font-size: 12px; display: block; margin-top: 5px;">Use the locator button or enter latitude/longitude manually.</small>
+                </div>
+                <button type="button" id="registerSubmit">Register</button>
+                <button type="button" class="btn-secondary" onclick="showLogin()">Already have an account? Login</button>
+            </form>
+        </div>
+        <div id="authError" class="error"></div>
+        <div id="authSuccess" class="success"></div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="container hidden">
+        <div class="dashboard">
+            <div class="header">
+                <div>
+                    <h1>Authority Dashboard</h1>
+                    <div class="user-info" id="userInfo"></div>
+                </div>
+                <button id="logoutButton" class="btn-secondary" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" id="issuesTab" onclick="showSection('issues')">Issues</button>
+                <button class="nav-tab" id="analyticsTab" onclick="showSection('analytics')">Analytics</button>
+            </div>
+
+            <div id="issuesSection">
+                <div class="filters">
+                    <select id="priorityFilter" onchange="loadIssues()">
+                        <option value="">All Priorities</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                    <select id="statusFilter" onchange="loadIssues()">
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Acknowledged">Acknowledged</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+
+                <div id="issuesContainer">
+                    <div id="loading">Loading issues...</div>
+                    <div id="issuesGrid" class="issues-grid"></div>
+                </div>
+            </div>
+
+            <div id="analyticsSection" class="hidden">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Status Breakdown</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Resolved vs Unresolved</h3>
+                        <canvas id="resolutionChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card" style="margin-top: 25px;">
+                    <h3>Key Performance Indicators</h3>
+                    <div id="kpiStats" style="line-height: 1.8; color: #444;">Select “Refresh Analytics” to load data.</div>
+                    <div id="analyticsLoader" style="margin-top: 10px; color: #666;"></div>
+                    <button id="analyticsRefreshBtn" style="width:auto; margin-top:15px;" onclick="loadAnalytics()">Refresh Analytics</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Detail Modal -->
+    <div id="issueModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeIssueModal()">&times;</span>
+            <div id="issueDetailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4000/api';
+        const LANGUAGE_STORAGE_KEY = 'portalLanguage';
+        const translations = {
+            en: {
+                common: {
+                    languageLabel: 'Language',
+                    portalTitle: 'Civic Authority Portal',
+                    dashboardTitle: 'Authority Dashboard',
+                    loggedInAs: 'Logged in as',
+                    departmentLabel: 'Department',
+                    loadingIssues: 'Loading issues...',
+                    noIssues: 'No issues found for your department. Issues will appear here once users report them.',
+                    distanceAvailable: 'Distance from your department',
+                    distanceUnavailable: 'Distance unavailable (missing location data)',
+                    reporter: 'Reporter',
+                    phone: 'Phone',
+                    email: 'Email',
+                    nameLabel: 'Name',
+                    addressLabel: 'Address',
+                    location: 'Location',
+                    reported: 'Reported',
+                    issueInformation: 'Issue Information',
+                    descriptionTitle: 'Description',
+                    lastUpdated: 'Last Updated',
+                    coordinates: 'Coordinates',
+                    modalTitle: 'Issue Details',
+                    timeline: 'Timeline',
+                    timelineEmpty: 'No timeline entries yet',
+                    analyticsStatusTitle: 'Status Breakdown',
+                    analyticsResolutionTitle: 'Resolved vs Unresolved',
+                    analyticsKpiTitle: 'Key Performance Indicators',
+                    analyticsInstructions: 'Select “Refresh Analytics” to load data.',
+                    notAvailable: 'N/A',
+                    totalIssuesLabel: 'Total Issues',
+                    resolvedIssuesLabel: 'Resolved Issues',
+                    avgResponseTimeLabel: 'Average Response Time',
+                    avgResolutionTimeLabel: 'Average Resolution Time',
+                    openSlaLabel: 'Open SLA Breaches',
+                    assignedToLabel: 'Assigned To',
+                    updateStatusTitle: 'Update Status',
+                    noDescription: 'No description'
+                },
+                tabs: { issues: 'Issues', analytics: 'Analytics' },
+                filters: {
+                    priorityAll: 'All Priorities',
+                    statusAll: 'All Status',
+                    priorityHigh: 'High',
+                    priorityMedium: 'Medium',
+                    priorityLow: 'Low',
+                    statusPending: 'Pending',
+                    statusAcknowledged: 'Acknowledged',
+                    statusInProgress: 'In Progress',
+                    statusResolved: 'Resolved'
+                },
+                auth: {
+                    loginTitle: 'Login',
+                    registerTitle: 'Register as Authority',
+                    emailLabel: 'Email',
+                    emailPlaceholder: 'Email address',
+                    passwordLabel: 'Password',
+                    passwordPlaceholder: 'Password',
+                    nameLabel: 'Name',
+                    namePlaceholder: 'Full name',
+                    phoneLabel: 'Phone Number',
+                    phonePlaceholder: '10-digit mobile number',
+                    departmentLabel: 'Department',
+                    deptAddressLabel: 'Department Location - Address',
+                    deptAddressPlaceholder: 'Street address',
+                    deptCityLabel: 'Department Location - City',
+                    deptCityPlaceholder: 'City',
+                    locationHint: 'Location will be automatically geocoded using Nominatim',
+                    coordsLabel: 'Department coordinates (optional)',
+                    coordsHint: 'Use the locator button or enter latitude/longitude manually.',
+                    registerPrompt: "Don't have an account? Register",
+                    loginPrompt: 'Already have an account? Login'
+                },
+                actions: {
+                    login: 'Login',
+                    register: 'Register',
+                    logout: 'Logout',
+                    viewDetails: 'View Details',
+                    acceptIssue: 'Accept Issue',
+                    startWork: 'Start Work',
+                    markResolved: 'Mark Resolved',
+                    useCurrentLocation: 'Use my current location',
+                    refreshAnalytics: 'Refresh Analytics',
+                    refreshIssues: 'Retry',
+                    viewOnMap: 'View on Map'
+                },
+                messages: {
+                    authorityOnly: 'Only authorities can access this portal',
+                    networkError: 'Network error. Please check if backend is running.',
+                    loginFailed: 'Login failed',
+                    registerFailed: 'Registration failed',
+                    registerSuccess: 'Registration successful! Please login.',
+                    analyticsLoadError: 'Unable to load analytics.',
+                    locationDetecting: 'Detecting location...',
+                    locationUnsupported: 'Geolocation is not supported in this browser.',
+                    locationDenied: 'Location permission denied.',
+                    locationSuccess: 'Location detected and filled automatically.',
+                    locationFail: 'Unable to auto-fill address. Please enter manually.',
+                    locationInsecure: 'Location access requires HTTPS or localhost.',
+                    issuesLoadError: 'Error loading issues',
+                    issueStatusUpdated: 'Issue status updated successfully.',
+                    issueStatusFailed: 'Failed to update status.',
+                    issueDetailsFailed: 'Failed to load issue details.'
+                },
+                status: {
+                    pending: 'Pending',
+                    acknowledged: 'Acknowledged',
+                    in_progress: 'In Progress',
+                    resolved: 'Resolved',
+                    new: 'Pending',
+                    unresolved: 'Unresolved'
+                },
+                priority: {
+                    high: 'High',
+                    medium: 'Medium',
+                    low: 'Low'
+                }
+            },
+            hi: {
+                common: {
+                    languageLabel: 'भाषा',
+                    portalTitle: 'नागरिक प्राधिकरण पोर्टल',
+                    dashboardTitle: 'प्राधिकरण डैशबोर्ड',
+                    loggedInAs: 'लॉग इन उपयोगकर्ता',
+                    departmentLabel: 'विभाग',
+                    loadingIssues: 'समस्याएँ लोड हो रही हैं...',
+                    noIssues: 'आपके विभाग के लिए कोई समस्या नहीं मिली। जैसे ही नागरिक रिपोर्ट करेंगे, यहाँ दिखाई देंगी।',
+                    distanceAvailable: 'आपके विभाग से दूरी',
+                    distanceUnavailable: 'दूरी उपलब्ध नहीं (स्थान डेटा अनुपलब्ध)',
+                    reporter: 'सूचना भेजने वाला',
+                    phone: 'फोन',
+                    email: 'ईमेल',
+                    nameLabel: 'नाम',
+                    addressLabel: 'पता',
+                    location: 'स्थान',
+                    reported: 'रिपोर्ट किया गया',
+                    issueInformation: 'समस्या की जानकारी',
+                    descriptionTitle: 'विवरण',
+                    lastUpdated: 'अंतिम अपडेट',
+                    coordinates: 'निर्देशांक',
+                    modalTitle: 'समस्या विवरण',
+                    timeline: 'समयरेखा',
+                    timelineEmpty: 'अभी तक कोई समयरेखा प्रविष्टि नहीं',
+                    analyticsStatusTitle: 'स्थिति विभाजन',
+                    analyticsResolutionTitle: 'निपटाए बनाम लंबित',
+                    analyticsKpiTitle: 'मुख्य प्रदर्शन संकेतक',
+                    analyticsInstructions: 'डेटा लोड करने के लिए "विश्लेषण रीफ्रेश करें" पर क्लिक करें।',
+                    notAvailable: 'एन/ए',
+                    totalIssuesLabel: 'कुल समस्याएँ',
+                    resolvedIssuesLabel: 'निपटाई गई समस्याएँ',
+                    avgResponseTimeLabel: 'औसत प्रतिक्रिया समय',
+                    avgResolutionTimeLabel: 'औसत समाधान समय',
+                    openSlaLabel: 'खुली SLA उल्लंघन',
+                    assignedToLabel: 'नियुक्त अधिकारी',
+                    updateStatusTitle: 'स्थिति अपडेट करें',
+                    noDescription: 'विवरण उपलब्ध नहीं'
+                },
+                tabs: { issues: 'समस्याएँ', analytics: 'विश्लेषण' },
+                filters: {
+                    priorityAll: 'सभी प्राथमिकताएँ',
+                    statusAll: 'सभी स्थिति',
+                    priorityHigh: 'उच्च',
+                    priorityMedium: 'मध्यम',
+                    priorityLow: 'निम्न',
+                    statusPending: 'लंबित',
+                    statusAcknowledged: 'स्वीकृत',
+                    statusInProgress: 'प्रगति पर',
+                    statusResolved: 'निपटाया गया'
+                },
+                auth: {
+                    loginTitle: 'लॉगिन',
+                    registerTitle: 'प्राधिकरण के रूप में पंजीकरण',
+                    emailLabel: 'ईमेल',
+                    emailPlaceholder: 'ईमेल पता',
+                    passwordLabel: 'पासवर्ड',
+                    passwordPlaceholder: 'पासवर्ड',
+                    nameLabel: 'नाम',
+                    namePlaceholder: 'पूरा नाम',
+                    phoneLabel: 'फोन नंबर',
+                    phonePlaceholder: '10 अंकों का मोबाइल नंबर',
+                    departmentLabel: 'विभाग',
+                    deptAddressLabel: 'विभाग का पता',
+                    deptAddressPlaceholder: 'सड़क पता',
+                    deptCityLabel: 'विभाग का शहर',
+                    deptCityPlaceholder: 'शहर',
+                    locationHint: 'स्थान को नोमिनाटिम द्वारा स्वत: जियोकोड किया जाएगा',
+                    coordsLabel: 'विभाग निर्देशांक (वैकल्पिक)',
+                    coordsHint: 'बटन का उपयोग करें या अक्षांश/देशांतर मैन्युअली दर्ज करें।',
+                    registerPrompt: 'खाता नहीं है? पंजीकरण करें',
+                    loginPrompt: 'पहले से खाता है? लॉगिन करें'
+                },
+                actions: {
+                    login: 'लॉगिन',
+                    register: 'पंजीकरण',
+                    logout: 'लॉगआउट',
+                    viewDetails: 'विवरण देखें',
+                    acceptIssue: 'समस्या स्वीकार करें',
+                    startWork: 'कार्य प्रारंभ करें',
+                    markResolved: 'समाधान चिह्नित करें',
+                    useCurrentLocation: 'मेरा वर्तमान स्थान उपयोग करें',
+                    refreshAnalytics: 'विश्लेषण रीफ्रेश करें',
+                    refreshIssues: 'फिर से प्रयास करें',
+                    viewOnMap: 'मानचित्र पर देखें'
+                },
+                messages: {
+                    authorityOnly: 'केवल प्राधिकरण उपयोगकर्ता ही इस पोर्टल तक पहुँच सकते हैं',
+                    networkError: 'नेटवर्क त्रुटि। कृपया बैकएंड की जाँच करें।',
+                    loginFailed: 'लॉगिन विफल',
+                    registerFailed: 'पंजीकरण विफल',
+                    registerSuccess: 'पंजीकरण सफल! कृपया लॉगिन करें।',
+                    analyticsLoadError: 'विश्लेषण लोड नहीं हो पाया।',
+                    locationDetecting: 'स्थान खोजा जा रहा है...',
+                    locationUnsupported: 'यह ब्राउज़र जियोलोकेशन समर्थन नहीं करता।',
+                    locationDenied: 'स्थान अनुमिति अस्वीकृत।',
+                    locationSuccess: 'स्थान सफलतापूर्वक भरा गया।',
+                    locationFail: 'स्थान स्वत: भरने में असमर्थ। कृपया मैन्युअली भरें।',
+                    locationInsecure: 'स्थान ऐक्सेस के लिए HTTPS या localhost आवश्यक है।',
+                    issuesLoadError: 'समस्याएँ लोड करने में त्रुटि',
+                    issueStatusUpdated: 'स्थिति सफलतापूर्वक अपडेट हुई।',
+                    issueStatusFailed: 'स्थिति अपडेट विफल।',
+                    issueDetailsFailed: 'समस्या विवरण लोड नहीं हो सका।'
+                },
+                status: {
+                    pending: 'लंबित',
+                    acknowledged: 'स्वीकृत',
+                    in_progress: 'प्रगति पर',
+                    resolved: 'निपटाया गया',
+                    new: 'लंबित',
+                    unresolved: 'अनसुलझा'
+                },
+                priority: {
+                    high: 'उच्च',
+                    medium: 'मध्यम',
+                    low: 'निम्न'
+                }
+            }
+        };
+
+        const languageSelect = document.getElementById('languageSelect');
+        const detectedLanguage = ((navigator.language || 'en').toLowerCase().startsWith('hi')) ? 'hi' : 'en';
+        let currentLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || detectedLanguage;
+        if (languageSelect) {
+            languageSelect.value = currentLanguage;
+            languageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
+        }
+
+        function getTranslation(lang, key) {
+            const parts = key.split('.');
+            let value = translations[lang];
+            for (const part of parts) {
+                if (value && typeof value === 'object' && part in value) {
+                    value = value[part];
+                } else {
+                    return null;
+                }
+            }
+            return value;
+        }
+
+        function t(key, fallback = '') {
+            let value = getTranslation(currentLanguage, key);
+            if (value == null) {
+                value = getTranslation('en', key);
+            }
+            if (value == null) {
+                return fallback || key;
+            }
+            return value;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+            if (languageSelect) {
+                languageSelect.value = lang;
+            }
+            applyTranslations();
+            if (!sections.analytics?.classList.contains('hidden') && analyticsLoaded) {
+                loadAnalytics();
+            } else {
+                loadIssues();
+            }
+        }
+
+        function applyTranslations() {
+            const portalTitleEl = document.querySelector('#authView h1');
+            if (portalTitleEl) portalTitleEl.textContent = t('common.portalTitle');
+            const dashboardTitleEl = document.querySelector('#dashboardView h1');
+            if (dashboardTitleEl) dashboardTitleEl.textContent = t('common.dashboardTitle');
+            const loginTitleEl = document.getElementById('authTitle');
+            if (loginTitleEl) loginTitleEl.textContent = t('auth.loginTitle');
+            const registerTitleEl = document.querySelector('#registerForm h2');
+            if (registerTitleEl) registerTitleEl.textContent = t('auth.registerTitle');
+
+            const labelSelectors = [
+                { selector: 'label[for="loginEmail"]', key: 'auth.emailLabel' },
+                { selector: 'label[for="loginPassword"]', key: 'auth.passwordLabel' },
+                { selector: 'label[for="regName"]', key: 'auth.nameLabel' },
+                { selector: 'label[for="regPhone"]', key: 'auth.phoneLabel' },
+                { selector: 'label[for="regEmail"]', key: 'auth.emailLabel' },
+                { selector: 'label[for="regPassword"]', key: 'auth.passwordLabel' },
+                { selector: 'label[for="regDepartment"]', key: 'auth.departmentLabel' },
+                { selector: 'label[for="regDeptAddress"]', key: 'auth.deptAddressLabel' },
+                { selector: 'label[for="regDeptCity"]', key: 'auth.deptCityLabel' }
+            ];
+            labelSelectors.forEach(({ selector, key }) => {
+                const el = document.querySelector(selector);
+                if (el) el.textContent = t(key);
+            });
+
+            const placeholderBindings = [
+                { id: 'loginEmail', key: 'auth.emailPlaceholder' },
+                { id: 'loginPassword', key: 'auth.passwordPlaceholder' },
+                { id: 'regName', key: 'auth.namePlaceholder' },
+                { id: 'regPhone', key: 'auth.phonePlaceholder' },
+                { id: 'regEmail', key: 'auth.emailPlaceholder' },
+                { id: 'regPassword', key: 'auth.passwordPlaceholder' },
+                { id: 'regDeptAddress', key: 'auth.deptAddressPlaceholder' },
+                { id: 'regDeptCity', key: 'auth.deptCityPlaceholder' }
+            ];
+            placeholderBindings.forEach(({ id, key }) => {
+                const el = document.getElementById(id);
+                if (el) el.placeholder = t(key, el.placeholder);
+            });
+
+            const buttonBindings = [
+                { selector: '#loginForm button[type="submit"]', key: 'actions.login' },
+                { selector: '#loginForm .btn-secondary', key: 'auth.registerPrompt' },
+                { selector: '#registerFormElement button[type="submit"]', key: 'actions.register' },
+                { selector: '#registerFormElement .btn-secondary', key: 'auth.loginPrompt' },
+                { selector: '#useCurrentLocationBtn', key: 'actions.useCurrentLocation' },
+                { selector: '#logoutButton', key: 'actions.logout' },
+                { selector: '#issuesTab', key: 'tabs.issues' },
+                { selector: '#analyticsTab', key: 'tabs.analytics' },
+                { selector: '#analyticsRefreshBtn', key: 'actions.refreshAnalytics' }
+            ];
+            buttonBindings.forEach(({ selector, key }) => {
+                const el = document.querySelector(selector);
+                if (el) el.textContent = t(key);
+            });
+
+            const hintEl = document.getElementById('locationHintText');
+            if (hintEl) hintEl.textContent = t('auth.locationHint');
+            const locationStatusLabel = document.getElementById('locationStatus');
+            if (locationStatusLabel) locationStatusLabel.textContent = t('auth.locationHint');
+            const coordsLabelEl = document.getElementById('coordsLabel');
+            if (coordsLabelEl) coordsLabelEl.textContent = t('auth.coordsLabel');
+            const coordsHintEl = document.getElementById('coordsHint');
+            if (coordsHintEl) coordsHintEl.textContent = t('auth.coordsHint');
+
+            const loadingEl = document.getElementById('loading');
+            if (loadingEl) loadingEl.textContent = t('common.loadingIssues');
+
+            const languageLabelEl = document.querySelector('.language-bar label');
+            if (languageLabelEl) languageLabelEl.textContent = t('common.languageLabel');
+
+            if (languageSelect) {
+                const enOption = languageSelect.querySelector('option[value="en"]');
+                const hiOption = languageSelect.querySelector('option[value="hi"]');
+                if (enOption) enOption.textContent = 'English';
+                if (hiOption) hiOption.textContent = 'हिंदी';
+            }
+
+            // Update filter dropdown text
+            const priorityFilter = document.getElementById('priorityFilter');
+            if (priorityFilter) {
+                priorityFilter.options[0].text = t('filters.priorityAll');
+                priorityFilter.options[1].text = t('filters.priorityHigh');
+                priorityFilter.options[2].text = t('filters.priorityMedium');
+                priorityFilter.options[3].text = t('filters.priorityLow');
+            }
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.options[0].text = t('filters.statusAll');
+                statusFilter.options[1].text = t('filters.statusPending');
+                statusFilter.options[2].text = t('filters.statusAcknowledged');
+                statusFilter.options[3].text = t('filters.statusInProgress');
+                statusFilter.options[4].text = t('filters.statusResolved');
+            }
+
+            const statusChartTitle = document.querySelector('#analyticsSection h3:nth-of-type(1)');
+            if (statusChartTitle) statusChartTitle.textContent = t('common.analyticsStatusTitle');
+            const resolutionChartTitle = document.querySelector('#analyticsSection .analytics-card:nth-of-type(2) h3');
+            if (resolutionChartTitle) resolutionChartTitle.textContent = t('common.analyticsResolutionTitle');
+            const kpiTitle = document.querySelector('#analyticsSection .analytics-card:nth-of-type(3) h3');
+            if (kpiTitle) kpiTitle.textContent = t('common.analyticsKpiTitle');
+            const kpiStats = document.getElementById('kpiStats');
+            if (kpiStats && !analyticsLoaded) {
+                kpiStats.textContent = t('common.analyticsInstructions');
+            }
+        }
+
+        function formatStatus(status) {
+            if (!status) return '';
+            const key = status.toLowerCase().replace(/\s+/g, '_');
+            return t(`status.${key}`, status);
+        }
+
+        let currentUser = null;
+        let authToken = null;
+        let analyticsLoaded = false;
+        applyTranslations();
+        const sections = {
+            issues: document.getElementById('issuesSection'),
+            analytics: document.getElementById('analyticsSection')
+        };
+        const tabs = {
+            issues: document.getElementById('issuesTab'),
+            analytics: document.getElementById('analyticsTab')
+        };
+        let statusChartInstance = null;
+        let resolutionChartInstance = null;
+        const deptLatInput = document.getElementById('regDeptLat');
+        const deptLngInput = document.getElementById('regDeptLng');
+        const locationStatusEl = document.getElementById('locationStatus');
+        const useCurrentLocationBtn = document.getElementById('useCurrentLocationBtn');
+        if (useCurrentLocationBtn) {
+            useCurrentLocationBtn.addEventListener('click', useCurrentDepartmentLocation);
+        }
+
+        // Check if user is already logged in
+        window.onload = () => {
+            authToken = localStorage.getItem('authToken');
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (authToken && currentUser) {
+                showDashboard();
+            }
+        };
+
+        const loginForm = document.getElementById('loginForm');
+        const loginSubmitBtn = document.getElementById('loginSubmit');
+        const registerFormEl = document.getElementById('registerFormElement');
+        const registerSubmitBtn = document.getElementById('registerSubmit');
+
+        const setButtonLoading = (button, isLoading, labelKey) => {
+            if (!button) return;
+            button.disabled = isLoading;
+            button.textContent = isLoading ? `${t(labelKey)}…` : t(labelKey);
+        };
+        const handleLogin = async () => {
+            const email = document.getElementById('loginEmail')?.value?.trim();
+            const password = document.getElementById('loginPassword')?.value;
+            if (!email || !password) {
+                showError(t('auth.allFieldsRequired'));
+                return;
+            }
+
+            try {
+                setButtonLoading(loginSubmitBtn, true, 'actions.login');
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    if (currentUser.role === 'authority') {
+                        showDashboard();
+                    } else {
+                        showError(t('messages.authorityOnly'));
+                    }
+                } else {
+                    showError(data.message || t('messages.loginFailed'));
+                }
+            } catch (error) {
+                showError(t('messages.networkError'));
+            } finally {
+                setButtonLoading(loginSubmitBtn, false, 'actions.login');
+            }
+        };
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleLogin();
+            });
+        }
+        if (loginSubmitBtn) {
+            loginSubmitBtn.addEventListener('click', handleLogin);
+        }
+
+        function setLocationStatus(message, color = '#666') {
+            if (!locationStatusEl) return;
+            locationStatusEl.textContent = message;
+            locationStatusEl.style.color = color;
+        }
+
+        const toRadians = (value) => (value * Math.PI) / 180;
+        function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+            const dLat = toRadians(lat2 - lat1);
+            const dLon = toRadians(lon2 - lon1);
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(toRadians(lat1)) *
+                Math.cos(toRadians(lat2)) *
+                Math.sin(dLon / 2) ** 2;
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return 6371 * c; // Earth radius km
+        }
+
+        function getAuthorityCoords() {
+            if (!currentUser?.departmentLocation) return null;
+            const lat = parseFloat(currentUser.departmentLocation.latitude);
+            const lng = parseFloat(currentUser.departmentLocation.longitude);
+            if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+            return { lat, lng };
+        }
+
+        function getIssueCoords(issue) {
+            if (!issue?.location) return null;
+            const lat = parseFloat(issue.location.lat ?? issue.location.latitude);
+            const lng = parseFloat(issue.location.lng ?? issue.location.longitude);
+            if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+            return { lat, lng };
+        }
+
+        function getRadiusInfo(issue) {
+            const authorityCoords = getAuthorityCoords();
+            const issueCoords = getIssueCoords(issue);
+            if (!authorityCoords || !issueCoords) return null;
+            const distance = calculateDistanceKm(
+                authorityCoords.lat,
+                authorityCoords.lng,
+                issueCoords.lat,
+                issueCoords.lng
+            );
+            return { distance };
+        }
+
+        async function useCurrentDepartmentLocation() {
+            if (!navigator.geolocation) {
+                setLocationStatus(t('messages.locationUnsupported'), '#dc3545');
+                return;
+            }
+            const hostname = window.location.hostname;
+            const isLocalhost = ['localhost', '127.0.0.1', '::1', '[::1]'].includes(hostname);
+            if (!window.isSecureContext && !isLocalhost) {
+                setLocationStatus(t('messages.locationInsecure'), '#dc3545');
+                return;
+            }
+            setLocationStatus(t('messages.locationDetecting'), '#666');
+            if (useCurrentLocationBtn) useCurrentLocationBtn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                try {
+                    const { latitude, longitude } = position.coords;
+                    if (deptLatInput) deptLatInput.value = latitude;
+                    if (deptLngInput) deptLngInput.value = longitude;
+
+                    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Unable to fetch address from Nominatim');
+                    }
+
+                    const data = await response.json();
+                    if (data) {
+                        const addressInput = document.getElementById('regDeptAddress');
+                        const cityInput = document.getElementById('regDeptCity');
+                        if (addressInput) {
+                            addressInput.value = data.display_name || data.address?.road || addressInput.value;
+                        }
+                        if (cityInput) {
+                            cityInput.value = data.address?.city || data.address?.town || data.address?.village || data.address?.state || cityInput.value;
+                        }
+                    }
+
+                    setLocationStatus(t('messages.locationSuccess'), '#28a745');
+                } catch (error) {
+                    console.error('Location detection failed:', error);
+                    setLocationStatus(t('messages.locationFail'), '#dc3545');
+                } finally {
+                    if (useCurrentLocationBtn) useCurrentLocationBtn.disabled = false;
+                }
+            }, (error) => {
+                console.error('Geolocation error:', error);
+                setLocationStatus(error.message || t('messages.locationDenied'), '#dc3545');
+                if (useCurrentLocationBtn) useCurrentLocationBtn.disabled = false;
+            }, {
+                enableHighAccuracy: true,
+                timeout: 15000
+            });
+        }
+
+        function showSection(section) {
+            Object.entries(sections).forEach(([key, el]) => {
+                if (!el) return;
+                if (key === section) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            Object.entries(tabs).forEach(([key, btn]) => {
+                if (!btn) return;
+                if (key === section) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            if (section === 'analytics' && !analyticsLoaded) {
+                loadAnalytics();
+            }
+        }
+
+        function normalizeStatusCounts(byStatus) {
+            const normalized = {};
+            if (!byStatus) return normalized;
+            Object.keys(byStatus).forEach(key => {
+                normalized[key.toLowerCase()] = byStatus[key];
+            });
+            return normalized;
+        }
+
+        function renderStatusChart(byStatus) {
+            const ctxEl = document.getElementById('statusChart');
+            if (!ctxEl) return;
+            const ctx = ctxEl.getContext('2d');
+            const counts = normalizeStatusCounts(byStatus);
+            const pending = counts['pending'] || 0;
+            const acknowledged = counts['acknowledged'] || 0;
+            const inProgress = counts['in progress'] || counts['in_progress'] || 0;
+            const resolved = counts['resolved'] || 0;
+
+            if (statusChartInstance) statusChartInstance.destroy();
+
+            statusChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        t('status.pending'),
+                        t('status.acknowledged'),
+                        t('status.in_progress'),
+                        t('status.resolved')
+                    ],
+                    datasets: [{
+                        data: [pending, acknowledged, inProgress, resolved],
+                        backgroundColor: ['#ffc107', '#17a2b8', '#007bff', '#28a745'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderResolutionChart(byStatus) {
+            const ctxEl = document.getElementById('resolutionChart');
+            if (!ctxEl) return;
+            const ctx = ctxEl.getContext('2d');
+            const counts = normalizeStatusCounts(byStatus);
+            const resolved = counts['resolved'] || 0;
+            const unresolved = (counts['pending'] || 0) + (counts['acknowledged'] || 0) + (counts['in progress'] || counts['in_progress'] || 0);
+
+            if (resolutionChartInstance) resolutionChartInstance.destroy();
+
+            resolutionChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [t('status.resolved'), t('status.unresolved')],
+                    datasets: [{
+                        label: t('tabs.issues'),
+                        data: [resolved, unresolved],
+                        backgroundColor: ['#28a745', '#ff6b6b']
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateKpiStats(kpi) {
+            const container = document.getElementById('kpiStats');
+            if (!container) return;
+            if (!kpi) {
+                container.textContent = t('common.analyticsInstructions');
+                return;
+            }
+
+            container.innerHTML = `
+                <p><strong>${t('common.totalIssuesLabel')}:</strong> ${kpi.totalIssues ?? '-'}</p>
+                <p><strong>${t('common.resolvedIssuesLabel')}:</strong> ${kpi.resolvedIssues ?? '-'}</p>
+                <p><strong>${t('common.avgResponseTimeLabel')}:</strong> ${kpi.avgResponseTime ?? '-'}</p>
+                <p><strong>${t('common.avgResolutionTimeLabel')}:</strong> ${kpi.avgResolutionTime ?? '-'}</p>
+                <p><strong>${t('common.openSlaLabel')}:</strong> ${kpi.openSLABreached ?? '-'}</p>
+            `;
+        }
+
+        async function loadAnalytics() {
+            const loader = document.getElementById('analyticsLoader');
+            if (loader) loader.textContent = 'Loading analytics...';
+            if (!authToken) {
+                if (loader) loader.textContent = 'Please login to view analytics.';
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/issues/analytics`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to load analytics');
+                }
+                renderStatusChart(data.byStatus);
+                renderResolutionChart(data.byStatus);
+                updateKpiStats(data.kpi);
+                analyticsLoaded = true;
+                if (loader) loader.textContent = '';
+            } catch (error) {
+                console.error('Analytics error:', error);
+                if (loader) loader.textContent = error.message || 'Unable to load analytics.';
+            }
+        }
+
+        // Register
+        if (registerFormEl) {
+            registerFormEl.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const data = {
+                    name: document.getElementById('regName').value,
+                    phone: document.getElementById('regPhone').value,
+                    email: document.getElementById('regEmail').value,
+                    password: document.getElementById('regPassword').value,
+                    department: document.getElementById('regDepartment').value,
+                    departmentLocation: {
+                        address: document.getElementById('regDeptAddress').value,
+                        city: document.getElementById('regDeptCity').value,
+                    }
+                };
+                if (deptLatInput && deptLatInput.value && deptLngInput && deptLngInput.value) {
+                    data.departmentLocation.latitude = deptLatInput.value;
+                    data.departmentLocation.longitude = deptLngInput.value;
+                }
+
+                try {
+                    setButtonLoading(registerSubmitBtn, true, 'actions.register');
+                    const response = await fetch(`${API_BASE}/auth/register-authority`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        showSuccess(t('messages.registerSuccess'));
+                        setTimeout(() => showLogin(), 2000);
+                    } else {
+                        showError(result.message || t('messages.registerFailed'));
+                    }
+                } catch (error) {
+                    showError(t('messages.networkError'));
+                } finally {
+                    setButtonLoading(registerSubmitBtn, false, 'actions.register');
+                }
+            });
+            if (registerSubmitBtn) {
+                registerSubmitBtn.addEventListener('click', () => registerFormEl.requestSubmit());
+            }
+        }
+
+        // Load Issues
+        async function loadIssues() {
+            const priority = document.getElementById('priorityFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('issuesGrid').innerHTML = '';
+
+            try {
+                let url = `${API_BASE}/issues?transform=true`;
+                if (priority) url += `&priority=${priority}`;
+                // Map status filter to backend format
+                if (status) {
+                    const statusMap = {
+                        'Pending': 'Pending',
+                        'Acknowledged': 'Acknowledged',
+                        'In Progress': 'In Progress',
+                        'Resolved': 'Resolved'
+                    };
+                    url += `&status=${statusMap[status] || status}`;
+                }
+
+                console.log('Fetching issues from:', url);
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-Transform': 'true',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    throw new Error(errorData.message || `HTTP ${response.status}`);
+                }
+
+                const issues = await response.json();
+                console.log('Issues received:', issues);
+                document.getElementById('loading').style.display = 'none';
+
+                if (!issues || issues.length === 0) {
+                    document.getElementById('issuesGrid').innerHTML = `<p style="text-align: center; padding: 20px; color: #666;">${t('common.noIssues')}</p>`;
+                    return;
+                }
+
+                issues.forEach(issue => {
+                    const card = createIssueCard(issue);
+                    document.getElementById('issuesGrid').appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading issues:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('issuesGrid').innerHTML = `
+                    <div class="error" style="padding: 20px; text-align: center;">
+                        <p>${t('messages.issuesLoadError')}: ${error.message}</p>
+                        <p style="font-size: 12px; margin-top: 10px;">${t('messages.networkError')}</p>
+                        <button onclick="loadIssues()" style="margin-top: 10px;">${t('actions.refreshIssues')}</button>
+                    </div>
+                `;
+            }
+        }
+
+        function createIssueCard(issue) {
+            const card = document.createElement('div');
+            card.className = `issue-card ${issue.status.toLowerCase().replace(' ', '-')}`;
+            
+            // Normalize status for display (handle both formats)
+            const displayStatus = issue.status || issue.statusCode || 'Pending';
+            const normalizedStatus = displayStatus.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const statusClass = `status-${normalizedStatus.toLowerCase().replace(' ', '-')}`;
+            const priorityKey = (issue.priority || 'Medium').toLowerCase();
+            const priorityClass = `priority-${priorityKey}`;
+            const statusText = formatStatus(displayStatus);
+            const priorityText = t(`priority.${priorityKey}`, issue.priority || 'Medium');
+            
+            // Get reporter info
+            const reporterName = issue.reporter?.name || issue.user?.name || 'Unknown';
+            const reporterPhone = issue.reporter?.phone || issue.user?.phone || 'N/A';
+            
+            // Get first image if available
+            const firstImage = issue.images && issue.images.length > 0 ? issue.images[0] : null;
+            const radiusInfo = getRadiusInfo(issue);
+            const radiusMessage = radiusInfo
+                ? `<div class="radius-note">${t('common.distanceAvailable')}: ${radiusInfo.distance.toFixed(1)} km</div>`
+                : `<div class="radius-warning">${t('common.distanceUnavailable')}</div>`;
+            const acceptButtonHtml =
+                (displayStatus === 'Pending' || displayStatus === 'NEW')
+                    ? `<button class="btn-small btn-info" onclick="updateStatus('${issue.id}', 'Acknowledged')">${t('actions.acceptIssue')}</button>`
+                    : '';
+
+            card.innerHTML = `
+                <div class="issue-header">
+                    <div>
+                        <strong>${issue.category || issue.categoryCode || 'N/A'}</strong>
+                        <span class="priority-badge ${priorityClass}">${priorityText}</span>
+                    </div>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                ${firstImage ? `<img src="${firstImage}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 5px; margin-bottom: 10px;" alt="Issue image">` : ''}
+                <div class="issue-description">${issue.description || t('common.noDescription')}</div>
+                <div style="font-size: 12px; color: #666; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <div><strong>${t('common.reporter')}:</strong> ${reporterName}</div>
+                    <div><strong>${t('common.phone')}:</strong> ${reporterPhone}</div>
+                    <div><strong>${t('common.location')}:</strong> ${issue.location?.address || t('common.notAvailable', 'N/A')}</div>
+                    <div><strong>${t('common.reported')}:</strong> ${new Date(issue.reportedDate).toLocaleDateString()}</div>
+                </div>
+                ${radiusMessage}
+                <div class="issue-actions">
+                    <button class="btn-small btn-secondary" onclick="viewIssueDetails('${issue.id}')">${t('actions.viewDetails')}</button>
+                    ${acceptButtonHtml}
+                    ${(displayStatus === 'Acknowledged' || displayStatus === 'ACKNOWLEDGED') ? `<button class="btn-small btn-info" onclick="updateStatus('${issue.id}', 'In Progress')">${t('actions.startWork')}</button>` : ''}
+                    ${(displayStatus === 'In Progress' || displayStatus === 'IN_PROGRESS') ? `<button class="btn-small btn-success" onclick="updateStatus('${issue.id}', 'Resolved')">${t('actions.markResolved')}</button>` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        async function viewIssueDetails(issueId) {
+            try {
+                const response = await fetch(`${API_BASE}/issues/${issueId}?transform=true`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-Transform': 'true'
+                    }
+                });
+
+                const issue = await response.json();
+                if (response.ok) {
+                    displayIssueDetails(issue);
+                } else {
+                    alert(t('messages.issueDetailsFailed'));
+                }
+            } catch (error) {
+                alert(t('messages.issueDetailsFailed'));
+            }
+        }
+
+        function displayIssueDetails(issue) {
+            const reporterName = issue.reporter?.name || issue.user?.name || 'Unknown';
+            const reporterPhone = issue.reporter?.phone || issue.user?.phone || 'N/A';
+            const reporterEmail = issue.user?.email || 'N/A';
+            
+            const displayStatus = issue.status || issue.statusCode || 'Pending';
+            const normalizedStatus = displayStatus.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const statusClass = `status-${normalizedStatus.toLowerCase().replace(' ', '-')}`;
+            const priorityKey = (issue.priority || 'Medium').toLowerCase();
+            const priorityClass = `priority-${priorityKey}`;
+            const statusText = formatStatus(displayStatus);
+            const priorityText = t(`priority.${priorityKey}`, issue.priority || 'Medium');
+            const radiusInfo = getRadiusInfo(issue);
+            const radiusMessage = radiusInfo
+                ? `<div class="radius-note">${t('common.distanceAvailable')}: ${radiusInfo.distance.toFixed(1)} km</div>`
+                : `<div class="radius-warning">${t('common.distanceUnavailable')}</div>`;
+            const acceptButtonHtml =
+                (displayStatus === 'Pending' || displayStatus === 'NEW')
+                    ? `<button class="btn-small btn-info" onclick="updateStatus('${issue.id}', 'Acknowledged'); closeIssueModal();">${t('actions.acceptIssue')}</button>`
+                    : '';
+
+            let imagesHtml = '';
+            if (issue.images && issue.images.length > 0) {
+                imagesHtml = '<div class="issue-images">';
+                issue.images.forEach(img => {
+                    imagesHtml += `<img src="${img}" alt="Issue image" onclick="window.open('${img}', '_blank')">`;
+                });
+                imagesHtml += '</div>';
+            }
+
+            let timelineHtml = '';
+            if (issue.history && issue.history.length > 0) {
+                timelineHtml = `<div class="timeline"><h3>${t('common.timeline')}</h3>`;
+                issue.history.forEach(item => {
+                    const date = new Date(item.timestamp).toLocaleString();
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-status">${formatStatus(item.status)}</div>
+                            <div class="timeline-note">${item.notes || t('common.noDescription')}</div>
+                            <div class="timeline-date">${date}</div>
+                        </div>
+                    `;
+                });
+                timelineHtml += '</div>';
+            } else {
+                timelineHtml = `<div class="timeline"><p>${t('common.timelineEmpty')}</p></div>`;
+            }
+
+            document.getElementById('issueDetailContent').innerHTML = `
+                <h2>${t('common.modalTitle')}</h2>
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                    <div>
+                        <h3>${issue.category || issue.categoryCode || 'N/A'}</h3>
+                        <span class="priority-badge ${priorityClass}">${priorityText}</span>
+                        <span class="status-badge ${statusClass}" style="margin-left: 10px;">${statusText}</span>
+                    </div>
+                </div>
+                ${imagesHtml}
+                <div style="margin: 20px 0;">
+                    <h4>${t('common.descriptionTitle')}</h4>
+                    <p>${issue.description || t('common.noDescription')}</p>
+                </div>
+                <div style="margin: 20px 0;">
+                    <h4>${t('common.reporter')}</h4>
+                    <p><strong>${t('common.nameLabel')}:</strong> ${reporterName}</p>
+                    <p><strong>${t('common.phone')}:</strong> ${reporterPhone}</p>
+                    <p><strong>${t('common.email')}:</strong> ${reporterEmail}</p>
+                </div>
+                <div style="margin: 20px 0;">
+                    <h4>${t('common.location')}</h4>
+                    <p><strong>${t('common.addressLabel')}:</strong> ${issue.location?.address || t('common.notAvailable', 'N/A')}</p>
+                    ${issue.location?.lat && issue.location?.lng ? 
+                        `<p><strong>${t('common.coordinates')}:</strong> ${issue.location.lat}, ${issue.location.lng}</p>
+                         <a href="https://www.google.com/maps?q=${issue.location.lat},${issue.location.lng}" target="_blank" style="color: #667eea;">${t('actions.viewOnMap')}</a>` 
+                        : ''}
+                </div>
+                <div style="margin: 20px 0;">
+                    <h4>${t('common.issueInformation')}</h4>
+                    <p><strong>${t('common.reported')}:</strong> ${new Date(issue.reportedDate).toLocaleString()}</p>
+                    <p><strong>${t('common.lastUpdated')}:</strong> ${new Date(issue.updatedDate).toLocaleString()}</p>
+                    ${issue.assignedTo ? `<p><strong>${t('common.assignedToLabel')}:</strong> ${issue.assignedTo.officerName || t('common.notAvailable', 'N/A')}</p>` : ''}
+                </div>
+                ${radiusMessage}
+                ${timelineHtml}
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                    <h4>${t('common.updateStatusTitle')}</h4>
+                    <div class="issue-actions">
+                        ${acceptButtonHtml}
+                        ${(displayStatus === 'Acknowledged' || displayStatus === 'ACKNOWLEDGED') ? `<button class="btn-small btn-info" onclick="updateStatus('${issue.id}', 'In Progress'); closeIssueModal();">${t('actions.startWork')}</button>` : ''}
+                        ${(displayStatus === 'In Progress' || displayStatus === 'IN_PROGRESS') ? `<button class="btn-small btn-success" onclick="updateStatus('${issue.id}', 'Resolved'); closeIssueModal();">${t('actions.markResolved')}</button>` : ''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('issueModal').style.display = 'block';
+        }
+
+        function closeIssueModal() {
+            document.getElementById('issueModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('issueModal');
+            if (event.target == modal) {
+                closeIssueModal();
+            }
+        }
+
+        async function updateStatus(issueId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE}/issues/${issueId}/status?transform=true`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-Transform': 'true'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus,
+                        notes: `Status updated to ${newStatus} by ${currentUser.name}`
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(t('messages.issueStatusUpdated'));
+                    loadIssues();
+                    if (document.getElementById('issueModal').style.display === 'block') {
+                        viewIssueDetails(issueId);
+                    }
+                } else {
+                    alert(data.message || t('messages.issueStatusFailed'));
+                }
+            } catch (error) {
+                alert(t('messages.issueStatusFailed'));
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('dashboardView').classList.remove('hidden');
+            document.getElementById('userInfo').textContent =
+                `${t('common.loggedInAs')}: ${currentUser.name} | ${t('common.departmentLabel')}: ${currentUser.department || t('common.notAvailable', 'N/A')}`;
+            analyticsLoaded = false;
+            showSection('issues');
+            loadIssues();
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('authForm').classList.remove('hidden');
+            document.getElementById('authTitle').textContent = t('auth.loginTitle');
+            clearMessages();
+        }
+
+        function showRegister() {
+            document.getElementById('authForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            clearMessages();
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            authToken = null;
+            currentUser = null;
+            analyticsLoaded = false;
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('authView').classList.remove('hidden');
+            showLogin();
+        }
+
+        function showError(message) {
+            document.getElementById('authError').textContent = message;
+            document.getElementById('authSuccess').textContent = '';
+        }
+
+        function showSuccess(message) {
+            document.getElementById('authSuccess').textContent = message;
+            document.getElementById('authError').textContent = '';
+        }
+
+        function clearMessages() {
+            document.getElementById('authError').textContent = '';
+            document.getElementById('authSuccess').textContent = '';
+        }
+    </script>
+</body>
+</html>
+

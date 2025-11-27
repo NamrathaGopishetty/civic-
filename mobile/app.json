@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "CivicMobile",
+    "slug": "civic-mobile",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "orientation": "portrait",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera to take photos of civic issues.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select images of civic issues.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to tag the location of civic issues."
+      }
+    },
+    "android": {
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your civic reports."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow CivicMobile to use your location to tag issue locations."
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}
