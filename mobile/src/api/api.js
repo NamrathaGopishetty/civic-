@@ -63,4 +63,6 @@ client.interceptors.request.use(async (config) => {
   return config;
 });
 
+export const API_BASE_URL = API_BASE;
+
 export default client;

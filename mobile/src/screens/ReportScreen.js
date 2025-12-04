@@ -5,6 +5,7 @@ import api from '../api/api';
 import { getCurrentLocationAsync } from '../utils/location';
 import MenuBar from '../components/MenuBar';
 import { clearToken } from '../utils/auth';
+import { disconnectRealtime } from '../utils/realtime';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
@@ -101,6 +102,7 @@ export default function ReportScreen({ navigation }) {
 
   const handleLogout = async () => {
     await clearToken();
+    disconnectRealtime();
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],

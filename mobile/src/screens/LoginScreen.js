@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import api from '../api/api';
 import { saveToken } from '../utils/auth';
+import { connectRealtime } from '../utils/realtime';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
@@ -14,6 +15,9 @@ export default function LoginScreen({ navigation }) {
     try {
       const resp = await api.post('/auth/login', { email, password });
       await saveToken(resp.data.token);
+      if (resp.data?.user) {
+        connectRealtime(resp.data.user);
+      }
       navigation.replace('Report');
     } catch (err) {
       console.warn(err);

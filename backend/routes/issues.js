@@ -135,6 +135,13 @@ const auth = require("../middleware/auth");
 const cloudinary = require("../config/cloudinary");
 const { transformIssueForWebPortal } = require("../utils/transformIssue");
 const { sendMail } = require("../config/mailer");
+const { sendPushAsync } = require("../utils/push");
+
+const emitIssueEvent = (io, userId, payload) => {
+  if (!io || !userId) return;
+  io.to(`user:${userId}`).emit("issue-update", payload);
+};
+const { sendPushNotificationsAsync } = require("../utils/push");
 
 const MAX_FILES = 5;
 const upload = multer({
@@ -220,7 +227,9 @@ router.post("/create", auth, upload.array("media", MAX_FILES), async (req, res) 
     await issue.save();
 
     try {
-      const reporter = await User.findById(req.user.id).select("name email");
+      const reporter = await User.findById(req.user.id).select(
+        "name email expoPushToken"
+      );
       if (reporter?.email) {
         await sendMail({
           to: reporter.email,
@@ -238,8 +247,29 @@ router.post("/create", auth, upload.array("media", MAX_FILES), async (req, res) 
           `,
         });
       }
-    } catch (mailErr) {
-      console.warn("Issue submission email failed:", mailErr.message);
+
+      if (reporter?.expoPushToken) {
+        await sendPushAsync({
+          to: reporter.expoPushToken,
+          title: "Issue submitted",
+          body: "Your issue has been submitted successfully.",
+          data: {
+            issueId: issue._id.toString(),
+            status: issue.status,
+          },
+        });
+      }
+
+      emitIssueEvent(req.io, req.user.id, {
+        type: "issueCreated",
+        issueId: issue._id.toString(),
+        status: issue.status,
+        title: "Issue submitted",
+        message: "Your issue has been submitted successfully.",
+        issue,
+      });
+    } catch (notifyErr) {
+      console.warn("Issue submission notification failed:", notifyErr.message);
     }
 
     res.status(201).json({
@@ -520,11 +550,30 @@ router.put("/:id/status", auth, async (req, res) => {
 
     try {
       const recipients = [];
+      const pushTokens = [];
+
       if (issue.user?.email) {
         recipients.push(issue.user.email);
       }
       if (currentUser?.email) {
         recipients.push(currentUser.email);
+      }
+
+      // Load full reporter user to get push token
+      const reporter = await User.findById(issue.user?._id).select(
+        "expoPushToken"
+      );
+      if (reporter?.expoPushToken) {
+        pushTokens.push(reporter.expoPushToken);
+      }
+
+      // Optionally notify authority on mobile if they ever use the app
+      const authority =
+        currentUser?.role === "authority"
+          ? await User.findById(currentUser._id).select("expoPushToken")
+          : null;
+      if (authority?.expoPushToken) {
+        pushTokens.push(authority.expoPushToken);
       }
 
       if (recipients.length) {
@@ -536,15 +585,59 @@ router.put("/:id/status", auth, async (req, res) => {
             <p>The issue <strong>${issue.description?.slice(0, 80) || issue._id}</strong> has been updated.</p>
             <ul>
               <li><strong>Status:</strong> ${status}</li>
-              <li><strong>Department:</strong> ${issue.assignedDepartment || currentUser?.department || "N/A"}</li>
+              <li><strong>Department:</strong> ${
+                issue.assignedDepartment || currentUser?.department || "N/A"
+              }</li>
               <li><strong>Notes:</strong> ${timelineNote}</li>
             </ul>
             <p>You will continue to receive notifications for future updates.</p>
           `,
         });
       }
-    } catch (mailErr) {
-      console.warn("Status update email failed:", mailErr.message);
+
+      if (pushTokens.length) {
+        await sendPushAsync({
+          to: pushTokens,
+          title: "Issue status updated",
+          body: `Status changed to ${status}`,
+          data: {
+            issueId: issue._id.toString(),
+            status,
+          },
+        });
+      }
+
+      const reporterId =
+        issue.user?._id?.toString() ||
+        (typeof issue.user === "string" ? issue.user : null);
+      if (reporterId) {
+        emitIssueEvent(req.io, reporterId, {
+          type: "issueStatusUpdated",
+          issueId: issue._id.toString(),
+          status,
+          title: "Issue status updated",
+          message: `Status changed to ${status}`,
+          notes: timelineNote,
+          issue,
+        });
+      }
+
+      if (currentUser?._id) {
+        emitIssueEvent(req.io, currentUser._id.toString(), {
+          type: "issueStatusUpdated",
+          issueId: issue._id.toString(),
+          status,
+          title: "Issue status updated",
+          message: `Status changed to ${status}`,
+          notes: timelineNote,
+          issue,
+        });
+      }
+    } catch (notifyErr) {
+      console.warn(
+        "Status update email / push notification failed:",
+        notifyErr.message
+      );
     }
 
     // Transform for web portal if requested

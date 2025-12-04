@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../api/api';
 import MenuBar from '../components/MenuBar';
 import { clearToken } from '../utils/auth';
+import { disconnectRealtime, subscribeToIssueEvents } from '../utils/realtime';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
@@ -29,13 +30,7 @@ export default function MyIssuesScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchIssues();
-    }, [])
-  );
-
-  const fetchIssues = async () => {
+  const fetchIssues = useCallback(async () => {
     try {
       setLoading(true);
       const resp = await api.get('/issues/my');
@@ -45,10 +40,25 @@ export default function MyIssuesScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchIssues();
+    }, [fetchIssues])
+  );
+
+  useEffect(() => {
+    const unsubscribe = subscribeToIssueEvents((event) => {
+      if (!event) return;
+      fetchIssues();
+    });
+    return unsubscribe;
+  }, [fetchIssues]);
 
   const handleLogout = async () => {
     await clearToken();
+    disconnectRealtime();
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],

@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema(
     role: { type: String, enum: ["citizen", "authority", "admin"], default: "citizen" },
     city: String,
     municipalityType: String,
+    expoPushToken: { type: String },
     // Authority-specific fields
     department: { type: String }, // e.g., "Roads", "Water", "Sanitation", "Electricity"
     departmentLocation: {

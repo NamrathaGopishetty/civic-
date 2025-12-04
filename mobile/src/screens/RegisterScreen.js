@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
 import api from '../api/api';
 import { saveToken } from '../utils/auth';
+import { connectRealtime } from '../utils/realtime';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
@@ -32,6 +33,9 @@ export default function RegisterScreen({ navigation }) {
       await api.post('/auth/register', payload);
       const loginResp = await api.post('/auth/login', { email: payload.email, password });
       await saveToken(loginResp.data.token);
+      if (loginResp.data?.user) {
+        connectRealtime(loginResp.data.user);
+      }
       navigation.replace('Report');
     } catch (err) {
       console.warn(err);

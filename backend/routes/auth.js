@@ -321,6 +321,7 @@ router.post("/login", async (req, res) => {
         role: user.role || "citizen",
         department: user.department,
         departmentLocation: user.departmentLocation,
+        expoPushToken: user.expoPushToken,
       },
     });
   } catch (err) {
@@ -348,10 +349,38 @@ router.get("/me", auth, async (req, res) => {
       role: user.role || "citizen",
       department: user.department,
       departmentLocation: user.departmentLocation,
+      expoPushToken: user.expoPushToken,
     });
   } catch (err) {
     console.error("Get Me Error:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+/**
+ * SAVE / UPDATE EXPO PUSH TOKEN
+ * POST /api/auth/push-token
+ */
+router.post("/push-token", auth, async (req, res) => {
+  try {
+    const { expoPushToken } = req.body;
+    if (!expoPushToken) {
+      return res.status(400).json({ message: "expoPushToken is required" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { expoPushToken },
+      { new: true }
+    ).select("id name email expoPushToken");
+
+    return res.json({
+      message: "Push token updated",
+      user,
+    });
+  } catch (err) {
+    console.error("Push token save error:", err);
+    res.status(500).json({ message: "Failed to save push token" });
   }
 });
 

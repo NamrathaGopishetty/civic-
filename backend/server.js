@@ -37,6 +37,12 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("🔌 User connected:", socket.id);
 
+  socket.on("register-user", (userId) => {
+    if (!userId) return;
+    socket.join(`user:${userId}`);
+    console.log(`👤 Socket ${socket.id} registered for user ${userId}`);
+  });
+
   socket.on("disconnect", () => {
     console.log("❌ User disconnected:", socket.id);
   });
