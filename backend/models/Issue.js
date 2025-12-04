@@ -17,7 +17,7 @@ const IssueSchema = new mongoose.Schema(
     media: [
       {
         url: String,
-        type: { type: String }, // "image" or "video"
+        type: { type: String }, // "image" or "video"(multi media)
       },
     ],
 
