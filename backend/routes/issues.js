@@ -141,7 +141,7 @@ const emitIssueEvent = (io, userId, payload) => {
   if (!io || !userId) return;
   io.to(`user:${userId}`).emit("issue-update", payload);
 };
-const { sendPushNotificationsAsync } = require("../utils/push");
+//const { sendPushNotificationsAsync } = require("../utils/push");
 
 const MAX_FILES = 5;
 const upload = multer({
