@@ -127,12 +127,12 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const path = require("path");
-const crypto = require("crypto");
+const streamifier = require("streamifier");
 
 const Issue = require("../models/Issue");
 const User = require("../models/User");
 const auth = require("../middleware/auth");
+const cloudinary = require("../config/cloudinary");
 const { transformIssueForWebPortal } = require("../utils/transformIssue");
 const { sendMail } = require("../config/mailer");
 const { sendPushAsync } = require("../utils/push");
@@ -144,16 +144,8 @@ const emitIssueEvent = (io, userId, payload) => {
 
 const MAX_FILES = 5;
 
-const diskStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, "..", "uploads")),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname) || (file.mimetype.includes("video") ? ".mp4" : ".jpg");
-    cb(null, `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${ext}`);
-  },
-});
-
 const upload = multer({
-  storage: diskStorage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024, files: MAX_FILES },
 });
 
@@ -174,6 +166,21 @@ const handleUploadErrors = (err, req, res, next) => {
   next();
 };
 
+const uploadToCloudinary = (file) =>
+  new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "civic_issues",
+        resource_type: "auto",
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+  });
+
 router.post("/create", auth, upload.array("media", MAX_FILES), handleUploadErrors, async (req, res) => {
   try {
     const { description, category, priority, latitude, longitude, address } =
@@ -188,11 +195,10 @@ router.post("/create", auth, upload.array("media", MAX_FILES), handleUploadError
     const mediaEntries = [];
 
     if (req.files && req.files.length > 0) {
-      const host = `${req.protocol}://${req.get("host")}`;
       for (const file of req.files) {
-        const fileUrl = `${host}/uploads/${file.filename}`;
+        const result = await uploadToCloudinary(file);
         mediaEntries.push({
-          url: fileUrl,
+          url: result.secure_url,
           type: file.mimetype.includes("video") ? "video" : "image",
         });
       }
