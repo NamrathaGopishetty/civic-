@@ -1,0 +1,88 @@
+{
+  "auth": {
+    "login": "लॉगिन",
+    "register": "रजिस्टर करें",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "name": "नाम",
+    "age": "उम्र",
+    "phone": "फोन",
+    "loginFailed": "लॉगिन विफल",
+    "checkCredentials": "क्रेडेंशियल जांचें",
+    "registerFailed": "रजिस्ट्रेशन विफल",
+    "haveAccount": "खाता है? लॉगिन करें",
+    "allFieldsRequired": "कृपया सभी फ़ील्ड भरें",
+    "invalidAgeTitle": "अमान्य आयु",
+    "invalidAgeMessage": "कृपया सही आयु दर्ज करें।"
+  },
+  "report": {
+    "title": "समस्या रिपोर्ट करें",
+    "description": "समस्या का वर्णन करें",
+    "category": "श्रेणी",
+    "priority": "प्राथमिकता",
+    "pickFromGallery": "गैलरी से चुनें",
+    "takePhoto": "फोटो लें",
+    "recordVideo": "वीडियो रिकॉर्ड करें",
+    "videoHint": "रिपोर्ट के साथ अपलोड होगा",
+    "useCurrentLocation": "वर्तमान स्थान का उपयोग करें",
+    "locationSet": "स्थान सेट किया गया",
+    "submitIssue": "समस्या सबमिट करें",
+    "success": "सफलता",
+    "issueSubmitted": "समस्या सबमिट की गई",
+    "uploadFailed": "अपलोड विफल",
+    "tryAgain": "पुनः प्रयास करें",
+    "validation": "सत्यापन",
+    "addDescription": "कृपया विवरण जोड़ें",
+    "locationDenied": "स्थान अस्वीकृत",
+    "enableLocationPermission": "स्थान अनुमति सक्षम करें",
+    "permissionNeeded": "अनुमति आवश्यक",
+    "allowMediaAccess": "मीडिया चुनने के लिए कृपया फोटो लाइब्रेरी की अनुमति दें।",
+    "allowCameraAccess": "मीडिया कैप्चर करने के लिए कैमरा अनुमति आवश्यक है।",
+    "high": "उच्च (1-2 दिन)",
+    "medium": "मध्यम (4-5 दिन)",
+    "low": "निम्न (7-8 दिन)"
+  },
+  "categories": {
+    "roads": "सड़कें",
+    "water": "पानी",
+    "sanitation": "सफाई",
+    "electricity": "बिजली",
+    "other": "अन्य"
+  },
+  "issues": {
+    "myIssues": "मेरी समस्याएं",
+    "status": "स्थिति",
+    "loading": "लोड हो रहा है...",
+    "timeline": "समयरेखा",
+    "timelineEmpty": "अभी कोई समयरेखा नहीं",
+    "attachments": "संलग्नियाँ",
+    "tapToOpen": "खोलने के लिए टैप करें"
+  },
+  "status": {
+    "pending": "लंबित",
+    "acknowledged": "स्वीकृत",
+    "inProgress": "प्रगति में",
+    "resolved": "हल हो गया",
+    "submitted": "सबमिट किया गया"
+  },
+  "common": {
+    "language": "भाषा",
+    "english": "अंग्रेजी",
+    "hindi": "हिंदी",
+    "selectLanguage": "भाषा चुनें",
+    "close": "बंद करें",
+    "logout": "लॉगआउट",
+    "location": "स्थान",
+    "coordinates": "निर्देशांक",
+    "assignedTo": "नियुक्त अधिकारी",
+    "reportedOn": "रिपोर्ट किया गया",
+    "lastUpdated": "अंतिम अपडेट",
+    "viewOnMap": "मानचित्र पर देखें",
+    "address": "पता",
+    "department": "विभाग",
+    "officer": "अधिकारी",
+    "notAvailable": "उपलब्ध नहीं",
+    "nameLabel": "नाम"
+  }
+}
+

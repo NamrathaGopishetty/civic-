@@ -1,0 +1,88 @@
+{
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "age": "Age",
+    "phone": "Phone",
+    "loginFailed": "Login failed",
+    "checkCredentials": "Check credentials",
+    "registerFailed": "Register failed",
+    "haveAccount": "Have an account? Login",
+    "allFieldsRequired": "Please fill all fields",
+    "invalidAgeTitle": "Invalid age",
+    "invalidAgeMessage": "Please enter a valid age."
+  },
+  "report": {
+    "title": "Report Issue",
+    "description": "Describe the problem",
+    "category": "Category",
+    "priority": "Priority",
+    "pickFromGallery": "Pick from Gallery",
+    "takePhoto": "Take Photo",
+    "recordVideo": "Record Video",
+    "videoHint": "Will upload with report",
+    "useCurrentLocation": "Use current location",
+    "locationSet": "Location set",
+    "submitIssue": "Submit Issue",
+    "success": "Success",
+    "issueSubmitted": "Issue submitted",
+    "uploadFailed": "Upload failed",
+    "tryAgain": "Try again",
+    "validation": "Validation",
+    "addDescription": "Please add a description",
+    "locationDenied": "Location denied",
+    "enableLocationPermission": "Enable location permission",
+    "permissionNeeded": "Permission needed",
+    "allowMediaAccess": "Please allow photo library access to select media.",
+    "allowCameraAccess": "Camera access is required to capture media.",
+    "high": "High (1-2 days)",
+    "medium": "Medium (4-5 days)",
+    "low": "Low (7-8 days)"
+  },
+  "categories": {
+    "roads": "Roads",
+    "water": "Water",
+    "sanitation": "Sanitation",
+    "electricity": "Electricity",
+    "other": "Other"
+  },
+  "issues": {
+    "myIssues": "My Issues",
+    "status": "Status",
+    "loading": "Loading...",
+    "timeline": "Timeline",
+    "timelineEmpty": "No timeline entries yet",
+    "attachments": "Attachments",
+    "tapToOpen": "Tap to open"
+  },
+  "status": {
+    "pending": "Pending",
+    "acknowledged": "Acknowledged",
+    "inProgress": "In Progress",
+    "resolved": "Resolved",
+    "submitted": "Submitted"
+  },
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "hindi": "Hindi",
+    "selectLanguage": "Select Language",
+    "close": "Close",
+    "logout": "Logout",
+    "location": "Location",
+    "coordinates": "Coordinates",
+    "assignedTo": "Assigned To",
+    "reportedOn": "Reported",
+    "lastUpdated": "Last Updated",
+    "viewOnMap": "View on Map",
+    "address": "Address",
+    "department": "Department",
+    "officer": "Officer",
+    "notAvailable": "Not available",
+    "nameLabel": "Name"
+  }
+}
+
