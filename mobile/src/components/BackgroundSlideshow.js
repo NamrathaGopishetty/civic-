@@ -12,6 +12,6 @@ export default function BackgroundSlideshow({ children }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D47A1',
+    backgroundColor: '#FFFFFF',
   },
 });
