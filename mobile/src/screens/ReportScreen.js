@@ -63,19 +63,19 @@ export default function ReportScreen({ navigation }) {
 
   const pickMedia = async () => {
     if (!(await ensureMediaLibraryPermission())) return;
-    const res = await ImagePicker.launchImageLibraryAsync({ allowsEditing: false, quality: 0.7, mediaTypes: ['images', 'videos'] });
+    const res = await ImagePicker.launchImageLibraryAsync({ allowsEditing: false, quality: 0.7, mediaTypes: ImagePicker.MediaTypeOptions.All });
     if (!res.canceled && res.assets?.length) res.assets.forEach(appendAsset);
   };
 
   const takePhoto = async () => {
     if (!(await ensureCameraPermission())) return;
-    const res = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.7 });
+    const res = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
     if (!res.canceled && res.assets?.[0]) appendAsset(res.assets[0]);
   };
 
   const recordVideo = async () => {
     if (!(await ensureCameraPermission())) return;
-    const res = await ImagePicker.launchCameraAsync({ mediaTypes: ['videos'], quality: 0.7, videoMaxDuration: 90, allowsEditing: false });
+    const res = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Videos, quality: 0.7, videoMaxDuration: 90, allowsEditing: false });
     if (!res.canceled && res.assets?.[0]) appendAsset(res.assets[0]);
   };
 
